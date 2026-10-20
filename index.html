@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FORTES Liderazgo · Invictus · CETYS Tijuana</title>
+<meta name="description" content="FORTES Liderazgo es el programa de liderazgo de CETYS Universidad en Tijuana. Conoce a la mesa directiva y lo que hace cada coordinación. Los integrantes entran aquí a Invictus, la plataforma de FORTES.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://invictus-fortes.github.io/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="FORTES Liderazgo">
+<meta property="og:title" content="FORTES Liderazgo · Invictus">
+<meta property="og:description" content="FORTES Liderazgo es el programa de liderazgo de CETYS Universidad en Tijuana. Conoce a la mesa directiva y lo que hace cada coordinación. Los integrantes entran aquí a Invictus, la plataforma de FORTES.">
+<meta property="og:url" content="https://invictus-fortes.github.io/">
+<meta property="og:image" content="https://invictus-fortes.github.io/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="es_MX">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#E5541C">
+<meta name="color-scheme" content="light dark">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Invictus">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icono-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"FORTES Liderazgo","alternateName":["FORTES Tijuana","FORTES Invictus"],"url":"https://invictus-fortes.github.io/","logo":"https://invictus-fortes.github.io/fortes.png","sameAs":["https://www.instagram.com/fortes.tij/"],"parentOrganization":{"@type":"CollegeOrUniversity","name":"CETYS Universidad"}}</script>
+<style>
+  html, body { margin: 0; height: 100%; background: #E5541C; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
+  body { font: 16px/1.45 system-ui, -apple-system, 'Segoe UI', Arial, sans-serif; color: #FFF6EC; }
+  #app { position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; border: 0; display: block; background: #E5541C; }
+  #espera { position: fixed; inset: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; padding: 24px;
+    background: linear-gradient(135deg, #F26A1B 0%, #E5541C 48%, #B9410F 100%); transition: opacity .3s ease-out; }
+  #espera.fuera { opacity: 0; pointer-events: none; }
+  #espera .disco { width: 132px; height: 132px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 35% 28%, #FFFDF9, #F3E8D8 72%);
+    box-shadow: 0 0 0 6px rgba(255,246,236,.38), 0 0 0 16px rgba(255,246,236,.12), 0 22px 40px -14px rgba(70,22,0,.65); margin-bottom: 18px; }
+  #espera .disco img { width: 104px; height: 104px; }
+  #espera h1 { margin: 0; font: 900 clamp(34px, 8vw, 54px)/1 system-ui, -apple-system, 'Segoe UI', Arial, sans-serif; letter-spacing: .02em; }
+  #espera .sub { margin: 0; font-weight: 700; letter-spacing: .3em; font-size: 14px; color: #FFE3CC; }
+  #espera p { margin: 0; max-width: 460px; }
+  #espera .cuerpo { font-size: 15px; opacity: .92; margin-top: 8px; }
+  #mas { display: none; max-width: 420px; }
+  #mas a, #falta a { display: inline-block; margin-top: 10px; background: #FFF6EC; color: #B9410F; font-weight: 800; text-decoration: none; padding: 11px 20px; border-radius: 999px; }
+  #falta { display: none; max-width: 520px; background: #fff; color: #231E1B; border-radius: 18px; padding: 20px; text-align: left; }
+  #falta code { background: #F4EDE1; padding: 1px 6px; border-radius: 6px; }
+  @media (prefers-reduced-motion: reduce) { #espera { transition: none; } }
+</style>
+</head>
+<body>
+<div id="espera" role="status">
+  <div class="disco"><img src="fortes.png" alt="Emblema de FORTES Liderazgo"></div>
+  <h1>FORTES</h1>
+  <p class="sub">LIDERAZGO</p>
+  <p>CETYS Universidad, Tijuana</p>
+  <p class="cuerpo">FORTES Liderazgo es el programa de liderazgo de CETYS Universidad en Tijuana. Conoce a la mesa directiva y lo que hace cada coordinación. Los integrantes entran aquí a Invictus, la plataforma de FORTES.</p>
+  <div id="mas">La página está tardando en abrir.<br><a id="directo" href="#" rel="noopener">Abrirla directamente</a></div>
+  <div id="falta">
+    <b style="font-size:17px">Falta un paso</b>
+    <p>Esta página todavía no sabe dónde está la app. Abre este archivo (<code>index.html</code>), busca la línea que dice <code>var APP =</code> y pega entre las comillas el link de la app, el que termina en <code>/exec</code>.</p>
+  </div>
+</div>
+<iframe id="app" title="FORTES Liderazgo · Invictus" allow="camera; microphone; clipboard-write; fullscreen" referrerpolicy="no-referrer" hidden></iframe>
+<script>
+/* ───────────── LO ÚNICO QUE SE CAMBIA ─────────────
+   Pega entre las comillas el link de la app (Apps Script › Implementar › Administrar implementaciones), el que termina en /exec.
+   Si algún día se publica con otra cuenta y el link cambia, basta con cambiarlo aquí: este link público sigue siendo el mismo. */
+var APP = 'https://script.google.com/macros/s/AKfycbzlvVbWWocGYMimdu2Kqr4yLCchontPFn6MJbLfpBZVS5I2AHD87xI3DdftI_QQ2IME/exec';
+
+(function () {
+  var espera = document.getElementById('espera'), marco = document.getElementById('app');
+  if (!/^https:\/\/script\.google\.com\/(a\/[-\w.]+\/)?macros\/s\/[-\w]+\/exec$/.test(APP)) {
+    document.getElementById('falta').style.display = 'block';
+    return;
+  }
+  // el QR de asistencia llega con ?s=…&c=…: se le pasa a la app tal cual (solo letras, números y guiones)
+  function limpio(v) { return String(v || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 64); }
+  var q = new URLSearchParams(window.location.search), s = limpio(q.get('s')), c = limpio(q.get('c'));
+  var destino = APP + (s && c ? '?s=' + s + '&c=' + c : '');
+  document.getElementById('directo').href = destino;
+  var listo = false;
+  marco.addEventListener('load', function () { listo = true; espera.className = 'fuera'; setTimeout(function () { espera.style.display = 'none'; }, 400); });
+  marco.hidden = false;
+  marco.src = destino;
+  setTimeout(function () { if (!listo) document.getElementById('mas').style.display = 'block'; }, 9000);
+  if (s && c && window.history && window.history.replaceState) { try { window.history.replaceState(null, '', window.location.pathname); } catch (e) { } }
+})();
+</script>
+</body>
+</html>

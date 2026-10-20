@@ -1,0 +1,11 @@
+PÁGINA PÚBLICA DE FORTES · INVICTUS (GitHub Pages, gratis)
+
+Link: https://invictus-fortes.github.io/
+El link de la app ya va adentro de index.html (var APP). Si algún día cambia, se cambia solo esa línea.
+
+1. (ya hecho)
+2. En GitHub, en el repositorio invictus-fortes.github.io, toca «Add file › Upload files», arrastra TODOS estos archivos
+   (no la carpeta) y toca «Commit changes».
+3. En la hoja Config de la app pon  PORTADA_URL = https://invictus-fortes.github.io/   (sin esto, Google no deja mostrar la app dentro de la página).
+
+Si la cuenta de GitHub no se llama invictus-fortes, hay que cambiar el link en index.html, robots.txt y sitemap.xml.
