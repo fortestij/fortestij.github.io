@@ -46,6 +46,16 @@
   #copia #sitio { pointer-events: auto; }
   #copia button, #copia a { pointer-events: none; }
   #copia-aviso { position: fixed; right: 14px; bottom: 14px; z-index: 4; background: rgba(35,30,27,.82); color: #fff; border-radius: 999px; padding: 7px 13px; font-size: 13px; font-weight: 600; display: none; }
+  #galleta { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 10; max-width: 640px; margin: 0 auto; background: #FFF6EC; color: #231E1B; border: 2px solid #231E1B; border-radius: 16px;
+    box-shadow: 4px 4px 0 #231E1B; padding: 14px 16px; font-size: 14px; display: none; }
+  #galleta b { display: block; font-size: 15px; margin-bottom: 4px; color: #B9410F; }
+  #galleta .bt { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; align-items: center; }
+  #galleta button { font: inherit; font-weight: 800; border-radius: 999px; padding: 8px 16px; cursor: pointer; border: 2px solid #231E1B; }
+  #galleta .si { background: linear-gradient(135deg,#F26A1B,#B9410F); color: #FFF6EC; border-color: #B9410F; }
+  #galleta .no { background: #fff; color: #231E1B; }
+  #galleta a { color: #B9410F; font-weight: 700; }
+  #legal { position: fixed; left: 0; right: 0; bottom: 4px; z-index: 1; text-align: center; font-size: 12px; }
+  #legal a { color: #FFE3CC; }
   #espera .disco { width: 132px; height: 132px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 35% 28%, #FFFDF9, #F3E8D8 72%);
     box-shadow: 0 0 0 6px rgba(255,246,236,.38), 0 0 0 16px rgba(255,246,236,.12), 0 22px 40px -14px rgba(70,22,0,.65); margin-bottom: 18px; }
   #espera .disco img { width: 104px; height: 104px; }
@@ -73,6 +83,11 @@
     <p>Esta página todavía no sabe dónde está la app. Abre este archivo (<code>index.html</code>), busca la línea que dice <code>var APP =</code> y pega entre las comillas el link de la app, el que termina en <code>/exec</code>.</p>
   </div>
 </div>
+<div id="galleta" role="dialog" aria-label="Aviso de cookies">
+  <b>Tu privacidad</b>
+  Esta página no usa cookies de publicidad ni de rastreo. Guarda en tu navegador lo necesario para funcionar y, si lo permites, una copia para abrir más rápido la próxima vez.
+  <div class="bt"><button class="si" id="galSi">Aceptar todo</button><button class="no" id="galNo">Solo lo necesario</button><a href="cookies.html">Política de cookies</a> · <a href="privacidad.html">Aviso de privacidad</a></div>
+</div>
 <iframe id="app" title="FORTES Liderazgo · Invictus" allow="camera; microphone; clipboard-write; fullscreen" referrerpolicy="no-referrer" hidden></iframe>
 <script>
 /* ───────────── LO ÚNICO QUE SE CAMBIA ─────────────
@@ -93,7 +108,15 @@ var APP = 'https://script.google.com/macros/s/AKfycbzlvVbWWocGYMimdu2Kqr4yLCchon
   // Invictus 9: la última copia de la página de FORTES se enseña al instante mientras la app carga por detrás
   var ORIGEN_APP = /^https:\/\/([-\w]+\.)*(googleusercontent\.com|google\.com)$/, copia = null, fuenteApp = null, origenApp = '*';
   function guardado(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
-  function guarda(k, v) { try { localStorage.setItem(k, v); } catch (e) { try { localStorage.removeItem('fortes_copia_html'); } catch (x) { } } }
+  function guarda(k, v) { if (k.indexOf('fortes_copia') === 0 && guardado('fortes_cookies') !== 'todo') return; try { localStorage.setItem(k, v); } catch (e) { try { localStorage.removeItem('fortes_copia_html'); } catch (x) { } } }
+  // Invictus 9 (Parte 7): aviso de cookies; la copia rápida solo se guarda con «Aceptar todo»
+  (function () {
+    var g = document.getElementById('galleta'), v = guardado('fortes_cookies');
+    function elige(x) { try { localStorage.setItem('fortes_cookies', x); if (x !== 'todo') ['fortes_copia_html', 'fortes_copia_css', 'fortes_copia_esq', 'fortes_copia_t'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) { } g.style.display = 'none'; }
+    if (v !== 'todo' && v !== 'necesario') g.style.display = 'block';
+    document.getElementById('galSi').onclick = function () { elige('todo'); };
+    document.getElementById('galNo').onclick = function () { elige('necesario'); };
+  })();
   if (!s && !boleto) {
     var h = guardado('fortes_copia_html'), css = guardado('fortes_copia_css'), t = Number(guardado('fortes_copia_t') || 0);
     if (h && css && Date.now() - t < 45 * 86400000) {
