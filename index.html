@@ -6,6 +6,13 @@
 <title>FORTES Liderazgo · Invictus · CETYS Tijuana</title>
 <meta name="description" content="FORTES Liderazgo es el programa de liderazgo de CETYS Universidad en Tijuana. Conoce a la mesa directiva y lo que hace cada coordinación. Los integrantes entran aquí a Invictus, la plataforma de FORTES.">
 <meta name="robots" content="index, follow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.googleusercontent.com; connect-src 'self' https://script.google.com https://script.googleusercontent.com; frame-src https://script.google.com https://*.googleusercontent.com; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<link rel="preconnect" href="https://script.google.com">
+<link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
+<link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Black&family=Instrument+Serif:ital@0;1&display=swap" media="print" onload="this.media='all'">
 <link rel="canonical" href="https://fortestij.github.io/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="FORTES Liderazgo">
@@ -34,6 +41,11 @@
   #espera { position: fixed; inset: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; padding: 24px;
     background: linear-gradient(135deg, #F26A1B 0%, #E5541C 48%, #B9410F 100%); transition: opacity .3s ease-out; }
   #espera.fuera { opacity: 0; pointer-events: none; }
+  #copia { position: fixed; inset: 0; z-index: 3; overflow: hidden; transition: opacity .28s ease-out; }
+  #copia.fuera { opacity: 0; pointer-events: none; }
+  #copia #sitio { pointer-events: auto; }
+  #copia button, #copia a { pointer-events: none; }
+  #copia-aviso { position: fixed; right: 14px; bottom: 14px; z-index: 4; background: rgba(35,30,27,.82); color: #fff; border-radius: 999px; padding: 7px 13px; font-size: 13px; font-weight: 600; display: none; }
   #espera .disco { width: 132px; height: 132px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 35% 28%, #FFFDF9, #F3E8D8 72%);
     box-shadow: 0 0 0 6px rgba(255,246,236,.38), 0 0 0 16px rgba(255,246,236,.12), 0 22px 40px -14px rgba(70,22,0,.65); margin-bottom: 18px; }
   #espera .disco img { width: 104px; height: 104px; }
@@ -76,15 +88,68 @@ var APP = 'https://script.google.com/macros/s/AKfycbzlvVbWWocGYMimdu2Kqr4yLCchon
   }
   // el QR de asistencia llega con ?s=…&c=…: se le pasa a la app tal cual (solo letras, números y guiones)
   function limpio(v) { return String(v || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 64); }
-  var q = new URLSearchParams(window.location.search), s = limpio(q.get('s')), c = limpio(q.get('c'));
-  var destino = APP + (s && c ? '?s=' + s + '&c=' + c : '');
+  var q = new URLSearchParams(window.location.search), s = limpio(q.get('s')), c = limpio(q.get('c')), boleto = limpio(q.get('boleto'));
+  var destino = APP + (s && c ? '?s=' + s + '&c=' + c : (boleto ? '?boleto=' + boleto : ''));
+  // Invictus 9: la última copia de la página de FORTES se enseña al instante mientras la app carga por detrás
+  var ORIGEN_APP = /^https:\/\/([-\w]+\.)*(googleusercontent\.com|google\.com)$/, copia = null, fuenteApp = null, origenApp = '*';
+  function guardado(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function guarda(k, v) { try { localStorage.setItem(k, v); } catch (e) { try { localStorage.removeItem('fortes_copia_html'); } catch (x) { } } }
+  if (!s && !boleto) {
+    var h = guardado('fortes_copia_html'), css = guardado('fortes_copia_css'), t = Number(guardado('fortes_copia_t') || 0);
+    if (h && css && Date.now() - t < 45 * 86400000) {
+      var st = document.createElement('style'); st.id = 'copia-css'; st.textContent = css; document.head.appendChild(st);
+      var esq = guardado('fortes_copia_esq'); if (esq) document.documentElement.setAttribute('data-esquema', esq);
+      copia = document.createElement('div'); copia.id = 'copia'; copia.innerHTML = h; document.body.appendChild(copia);
+      var av = document.createElement('div'); av.id = 'copia-aviso'; av.textContent = 'Cargando…'; document.body.appendChild(av);
+      setTimeout(function () { if (copia && copia.parentNode) av.style.display = 'block'; }, 1500);
+      espera.style.display = 'none';
+    }
+  }
+  function quitaCopia() {
+    if (!copia) return;
+    var y = 0, sit = copia.querySelector('#sitio'); if (sit) y = sit.scrollTop;
+    try { if (y && fuenteApp) fuenteApp.postMessage({ tipo: 'fortes-scroll', y: y }, origenApp); } catch (e) { }
+    var c0 = copia; copia = null; c0.className = 'fuera';
+    var av = document.getElementById('copia-aviso'); if (av) av.parentNode.removeChild(av);
+    setTimeout(function () { if (c0.parentNode) c0.parentNode.removeChild(c0); var st = document.getElementById('copia-css'); if (st) st.parentNode.removeChild(st); document.documentElement.removeAttribute('data-esquema'); }, 320);
+  }
+  /* Solo se acepta lo que manda la app que está dentro de esta misma página (no otra ventana) y la copia se limpia:
+     nada de scripts, marcos ni atributos on…, y ningún link javascript:. */
+  function limpia(html) {
+    var doc = new DOMParser().parseFromString('<div id="r">' + html + '</div>', 'text/html'), r = doc.getElementById('r');
+    if (!r) return '';
+    Array.prototype.forEach.call(r.querySelectorAll('script,iframe,object,embed,link,meta,base,form'), function (n) { n.parentNode.removeChild(n); });
+    Array.prototype.forEach.call(r.querySelectorAll('*'), function (n) {
+      Array.prototype.slice.call(n.attributes).forEach(function (a) {
+        var k = a.name.toLowerCase(), v = String(a.value || '').trim().toLowerCase();
+        if (k.indexOf('on') === 0 || ((k === 'href' || k === 'src' || k === 'xlink:href') && v.indexOf('javascript:') === 0)) n.removeAttribute(a.name);
+      });
+    });
+    return r.innerHTML;
+  }
+  window.addEventListener('message', function (e) {
+    if (!ORIGEN_APP.test(e.origin) || !e.data || typeof e.data !== 'object') return;
+    try { if (!e.source || e.source.top !== window) return; } catch (x) { return; }
+    if (e.data.tipo === 'fortes-listo') { fuenteApp = e.source; origenApp = e.origin; listo = true; espera.className = 'fuera'; setTimeout(quitaCopia, 120); }
+    if (e.data.tipo === 'fortes-sitio' && typeof e.data.html === 'string' && typeof e.data.css === 'string' && e.data.html.length < 1600000) {
+      var h = limpia(e.data.html);
+      if (!h) return;
+      guarda('fortes_copia_html', h);
+      guarda('fortes_copia_css', e.data.css.replace(/@import[^;]*;/gi, '').slice(0, 400000));
+      guarda('fortes_copia_esq', /^(claro|oscuro)?$/.test(e.data.esquema || '') ? (e.data.esquema || '') : '');
+      guarda('fortes_copia_t', String(Date.now()));
+    }
+  });
   document.getElementById('directo').href = destino;
   var listo = false;
-  marco.addEventListener('load', function () { listo = true; espera.className = 'fuera'; setTimeout(function () { espera.style.display = 'none'; }, 400); });
+  marco.addEventListener('load', function () {
+    listo = true; espera.className = 'fuera'; setTimeout(function () { espera.style.display = 'none'; }, 400);
+    setTimeout(quitaCopia, 6000);           // por si la app no avisa (versión vieja): la copia se quita sola
+  });
   marco.hidden = false;
   marco.src = destino;
   setTimeout(function () { if (!listo) document.getElementById('mas').style.display = 'block'; }, 9000);
-  if (s && c && window.history && window.history.replaceState) { try { window.history.replaceState(null, '', window.location.pathname); } catch (e) { } }
+  if (((s && c) || boleto) && window.history && window.history.replaceState) { try { window.history.replaceState(null, '', window.location.pathname); } catch (e) { } }
 })();
 </script>
 </body>
