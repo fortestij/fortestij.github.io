@@ -45,6 +45,7 @@
   #copia.fuera { opacity: 0; pointer-events: none; }
   #copia #sitio { pointer-events: auto; }
   #copia button, #copia a { pointer-events: none; }
+  #copia [onclick*="sitEntrar"], #copia .st-entrar { pointer-events: auto; cursor: pointer; }
   #copia-aviso { position: fixed; right: 14px; bottom: 14px; z-index: 4; background: rgba(35,30,27,.82); color: #fff; border-radius: 999px; padding: 7px 13px; font-size: 13px; font-weight: 600; display: none; }
   #galleta { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 10; max-width: 640px; margin: 0 auto; background: #FFF6EC; color: #231E1B; border: 2px solid #231E1B; border-radius: 16px;
     box-shadow: 4px 4px 0 #231E1B; padding: 14px 16px; font-size: 14px; display: none; }
@@ -88,7 +89,7 @@
   Esta página no usa cookies de publicidad ni de rastreo. Guarda en tu navegador lo necesario para funcionar y, si lo permites, una copia para abrir más rápido la próxima vez.
   <div class="bt"><button class="si" id="galSi">Aceptar todo</button><button class="no" id="galNo">Solo lo necesario</button><a href="cookies.html">Política de cookies</a> · <a href="privacidad.html">Aviso de privacidad</a></div>
 </div>
-<iframe id="app" title="FORTES Liderazgo · Invictus" allow="camera; microphone; clipboard-write; fullscreen" referrerpolicy="no-referrer" hidden></iframe>
+<iframe id="app" aria-label="FORTES Liderazgo · Invictus" allow="camera; microphone; clipboard-write; fullscreen" referrerpolicy="no-referrer" hidden></iframe>
 <script>
 /* ───────────── LO ÚNICO QUE SE CAMBIA ─────────────
    Pega entre las comillas el link de la app (Apps Script › Implementar › Administrar implementaciones), el que termina en /exec.
@@ -104,7 +105,9 @@ var APP = 'https://script.google.com/macros/s/AKfycbzlvVbWWocGYMimdu2Kqr4yLCchon
   // el QR de asistencia llega con ?s=…&c=…: se le pasa a la app tal cual (solo letras, números y guiones)
   function limpio(v) { return String(v || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 64); }
   var q = new URLSearchParams(window.location.search), s = limpio(q.get('s')), c = limpio(q.get('c')), boleto = limpio(q.get('boleto'));
-  var destino = APP + (s && c ? '?s=' + s + '&c=' + c : (boleto ? '?boleto=' + boleto : ''));
+  // Invictus 9.5: también el pasaporte de liderazgo (?pasaporte=) y la entrada directa (?entrar=1)
+  var pasaporte = String(q.get('pasaporte') || '').replace(/[^0-9a-fA-F]/g, '').slice(0, 40), entrar = q.get('entrar') === '1';
+  var destino = APP + (s && c ? '?s=' + s + '&c=' + c : (boleto ? '?boleto=' + boleto : (pasaporte ? '?pasaporte=' + pasaporte : (entrar ? '?entrar=1' : ''))));
   // Invictus 9: la última copia de la página de FORTES se enseña al instante mientras la app carga por detrás
   var ORIGEN_APP = /^https:\/\/([-\w]+\.)*(googleusercontent\.com|google\.com)$/, copia = null, fuenteApp = null, origenApp = '*';
   function guardado(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
@@ -117,7 +120,7 @@ var APP = 'https://script.google.com/macros/s/AKfycbzlvVbWWocGYMimdu2Kqr4yLCchon
     document.getElementById('galSi').onclick = function () { elige('todo'); };
     document.getElementById('galNo').onclick = function () { elige('necesario'); };
   })();
-  if (!s && !boleto) {
+  if (!s && !boleto && !pasaporte && !entrar) {
     var h = guardado('fortes_copia_html'), css = guardado('fortes_copia_css'), t = Number(guardado('fortes_copia_t') || 0);
     if (h && css && Date.now() - t < 45 * 86400000) {
       var st = document.createElement('style'); st.id = 'copia-css'; st.textContent = css; document.head.appendChild(st);
@@ -126,8 +129,17 @@ var APP = 'https://script.google.com/macros/s/AKfycbzlvVbWWocGYMimdu2Kqr4yLCchon
       var av = document.createElement('div'); av.id = 'copia-aviso'; av.textContent = 'Cargando…'; document.body.appendChild(av);
       setTimeout(function () { if (copia && copia.parentNode) av.style.display = 'block'; }, 1500);
       espera.style.display = 'none';
+      copia.addEventListener('click', function (ev) {
+        var b = ev.target.closest ? ev.target.closest('.st-entrar, .st-inv-chip, .st-bt-osc, [data-entrar]') : null;
+        if (!b) return;
+        ev.preventDefault(); quiereEntrar = true;
+        quitaCopia(); espera.style.display = ''; espera.className = '';
+        if (listo && fuenteApp) avisaEntrar();
+      });
     }
   }
+  var quiereEntrar = false;
+  function avisaEntrar() { if (!quiereEntrar || !fuenteApp) return; quiereEntrar = false; try { fuenteApp.postMessage({ tipo: 'fortes-entrar' }, origenApp); } catch (e) { } }
   function quitaCopia() {
     if (!copia) return;
     var y = 0, sit = copia.querySelector('#sitio'); if (sit) y = sit.scrollTop;
@@ -153,7 +165,7 @@ var APP = 'https://script.google.com/macros/s/AKfycbzlvVbWWocGYMimdu2Kqr4yLCchon
   window.addEventListener('message', function (e) {
     if (!ORIGEN_APP.test(e.origin) || !e.data || typeof e.data !== 'object') return;
     try { if (!e.source || e.source.top !== window) return; } catch (x) { return; }
-    if (e.data.tipo === 'fortes-listo') { fuenteApp = e.source; origenApp = e.origin; listo = true; espera.className = 'fuera'; setTimeout(quitaCopia, 120); }
+    if (e.data.tipo === 'fortes-listo') { fuenteApp = e.source; origenApp = e.origin; listo = true; espera.className = 'fuera'; setTimeout(quitaCopia, 120); avisaEntrar(); }
     if (e.data.tipo === 'fortes-sitio' && typeof e.data.html === 'string' && typeof e.data.css === 'string' && e.data.html.length < 1600000) {
       var h = limpia(e.data.html);
       if (!h) return;
@@ -172,7 +184,7 @@ var APP = 'https://script.google.com/macros/s/AKfycbzlvVbWWocGYMimdu2Kqr4yLCchon
   marco.hidden = false;
   marco.src = destino;
   setTimeout(function () { if (!listo) document.getElementById('mas').style.display = 'block'; }, 9000);
-  if (((s && c) || boleto) && window.history && window.history.replaceState) { try { window.history.replaceState(null, '', window.location.pathname); } catch (e) { } }
+  if (((s && c) || boleto || pasaporte || entrar) && window.history && window.history.replaceState) { try { window.history.replaceState(null, '', window.location.pathname); } catch (e) { } }
 })();
 </script>
 </body>
