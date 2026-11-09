@@ -107,7 +107,9 @@ var APP = 'https://script.google.com/macros/s/AKfycbzlvVbWWocGYMimdu2Kqr4yLCchon
   var q = new URLSearchParams(window.location.search), s = limpio(q.get('s')), c = limpio(q.get('c')), boleto = limpio(q.get('boleto'));
   // Invictus 9.5: también el pasaporte de liderazgo (?pasaporte=) y la entrada directa (?entrar=1)
   var pasaporte = String(q.get('pasaporte') || '').replace(/[^0-9a-fA-F]/g, '').slice(0, 40), entrar = q.get('entrar') === '1';
-  var destino = APP + (s && c ? '?s=' + s + '&c=' + c : (boleto ? '?boleto=' + boleto : (pasaporte ? '?pasaporte=' + pasaporte : (entrar ? '?entrar=1' : ''))));
+  // Invictus 9.5-F: la convocatoria (?convocatoria=abierta) y el estatus de quien se registró (?estatus=…)
+  var convocatoria = String(q.get('convocatoria') || '').replace(/[^A-Za-z0-9-]/g, '').slice(0, 30), estatus = String(q.get('estatus') || '').replace(/[^A-Za-z0-9.]/g, '').slice(0, 40);
+  var destino = APP + (s && c ? '?s=' + s + '&c=' + c : (boleto ? '?boleto=' + boleto : (pasaporte ? '?pasaporte=' + pasaporte : (estatus ? '?estatus=' + estatus : (convocatoria ? '?convocatoria=' + convocatoria : (entrar ? '?entrar=1' : ''))))));
   // Invictus 9: la última copia de la página de FORTES se enseña al instante mientras la app carga por detrás
   var ORIGEN_APP = /^https:\/\/([-\w]+\.)*(googleusercontent\.com|google\.com)$/, copia = null, fuenteApp = null, origenApp = '*';
   function guardado(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
@@ -120,7 +122,7 @@ var APP = 'https://script.google.com/macros/s/AKfycbzlvVbWWocGYMimdu2Kqr4yLCchon
     document.getElementById('galSi').onclick = function () { elige('todo'); };
     document.getElementById('galNo').onclick = function () { elige('necesario'); };
   })();
-  if (!s && !boleto && !pasaporte && !entrar) {
+  if (!s && !boleto && !pasaporte && !entrar && !estatus && !convocatoria) {
     var h = guardado('fortes_copia_html'), css = guardado('fortes_copia_css'), t = Number(guardado('fortes_copia_t') || 0);
     if (h && css && Date.now() - t < 45 * 86400000) {
       var st = document.createElement('style'); st.id = 'copia-css'; st.textContent = css; document.head.appendChild(st);
@@ -184,7 +186,7 @@ var APP = 'https://script.google.com/macros/s/AKfycbzlvVbWWocGYMimdu2Kqr4yLCchon
   marco.hidden = false;
   marco.src = destino;
   setTimeout(function () { if (!listo) document.getElementById('mas').style.display = 'block'; }, 9000);
-  if (((s && c) || boleto || pasaporte || entrar) && window.history && window.history.replaceState) { try { window.history.replaceState(null, '', window.location.pathname); } catch (e) { } }
+  if (((s && c) || boleto || pasaporte || entrar || estatus) && window.history && window.history.replaceState) { try { window.history.replaceState(null, '', window.location.pathname); } catch (e) { } }
 })();
 </script>
 </body>
